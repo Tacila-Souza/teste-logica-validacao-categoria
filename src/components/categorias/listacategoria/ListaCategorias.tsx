@@ -1,8 +1,9 @@
 import { Folder, Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
+import { AuthContext } from "../../../contestx/AuthContext";
 import type Categoria from "../../../models/Categoria";
 import { buscar } from "../../../service/service";
 import DeletarCategoria from "../deletarcategoria/DeletarCategoria";
@@ -11,17 +12,17 @@ import FormCategoria from "../formcategoria/FormCategoria";
 function ListaCategoria() {
   const [isLoading, setIsLoading] = useState(false);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const navigate = useNavigate();
   const [modalEditar, setModalEditar] = useState(false);
   const [modalDeletar, setModalDeletar] = useState(false);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<Categoria | null>(null);
 
-  // Recuperando o token (Ajuste conforme o seu contexto de Autenticação)
-  const token = localStorage.getItem("token") || "";
-  const header = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const navigate = useNavigate();
+
+  const { usuario } = useContext(AuthContext);
+  const token = usuario.token;
+  
+  const header = { 
+    headers: { Authorization: token }
   };
 
   async function buscarCategorias() {
@@ -35,14 +36,17 @@ function ListaCategoria() {
     }
   }
 
-    useEffect(() => {
-    if (token !== "") {
-        buscarCategorias();
-    } else {
-        toast.info("Você precisa estar logado");
-        navigate("/login");
+  useEffect(() => {
+    if (!token || token === "") {
+      toast.info("Você precisa estar logado para acessar este recurso.", {
+        toastId: "auth-info"
+      });
+      navigate("/login");
+      return;
     }
-}, [token]);
+
+    buscarCategorias();
+  }, [token, navigate]);
 
   function abrirModalNovaCategoria() {
     setCategoriaSelecionada(null);
@@ -59,12 +63,23 @@ function ListaCategoria() {
     setModalDeletar(true);
   }
 
-  function fecharModais() {
+  // 3. O fecharModais fica muito mais simples, reaproveitando a mesma função!
+  async function fecharModais() {
     setModalEditar(false);
     setModalDeletar(false);
     setCategoriaSelecionada(null);
-    buscarCategorias();
+    await buscarCategorias();
   }
+
+    try {
+      setIsLoading(true);
+      buscar("/categorias", setCategorias, header);
+    } catch (error) {
+      console.error("Erro ao atualizar lista:", error);
+    } finally {
+      setIsLoading(false);
+    }
+
 
   return (
     <>
@@ -162,6 +177,6 @@ function ListaCategoria() {
       )}
     </>
   );
-}
+ }
 
 export default ListaCategoria;
