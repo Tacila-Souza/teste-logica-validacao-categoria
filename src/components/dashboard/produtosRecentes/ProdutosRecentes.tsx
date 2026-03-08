@@ -10,12 +10,6 @@ export function ProdutosRecentes({ produtos }: Props) {
   const ultimos = produtos.slice(-5).reverse()
 
   // FORMATAÇÃO DE MOEDA
-  function formatarPreco(valor: number) {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    }).format(valor)
-  }
 
   return (
 
@@ -81,7 +75,7 @@ export function ProdutosRecentes({ produtos }: Props) {
               font-semibold
               text-orange-600
             ">
-              {formatarPreco(produto.preco)}
+
             </span>
 
           </div>
