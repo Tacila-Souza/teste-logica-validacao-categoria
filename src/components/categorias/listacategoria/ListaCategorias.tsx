@@ -1,5 +1,5 @@
 import { Folder, Pencil, Plus, Trash2 } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -25,17 +25,20 @@ function ListaCategoria() {
     headers: { Authorization: token }
   };
 
-  async function buscarCategorias() {
+const buscarCategorias = useCallback(async () => {
     try {
       setIsLoading(true);
-      await buscar("/categorias", setCategorias, header);
+      await buscar("/categorias", setCategorias, {
+        headers: { Authorization: token }
+      });
     } catch (error) {
       console.error("Erro ao buscar categorias:", error);
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [token]); // O React agora sabe que essa função só muda se o token mudar
 
+  // 3. O useEffect permanece igual, chamando a função
   useEffect(() => {
     if (!token || token === "") {
       toast.info("Você precisa estar logado para acessar este recurso.", {
@@ -46,7 +49,7 @@ function ListaCategoria() {
     }
 
     buscarCategorias();
-  }, [token, navigate]);
+  }, [token, navigate, buscarCategorias]);
 
   function abrirModalNovaCategoria() {
     setCategoriaSelecionada(null);
