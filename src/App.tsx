@@ -3,20 +3,21 @@ import { ToastContainer } from 'react-toastify'
 import './App.css'
 import FormProdutos from './components/produtos/formprdutos/FormProdutos'
 import { AuthProvider } from './contestx/AuthContext'
+import { CarrinhoProvider } from './contestx/CarrinhoContext'
+import LayoutCliente from './layouts/LayoutCliente'
+import LayoutRestaurante from './layouts/LayoutRestaurante'
 import Cadastro from './pages/cadastro/Cadastro'
 import Categorias from './pages/categorias/Categorias'
+import Dashboard from './pages/dashboard/Dashboard'
 import Login from './pages/login/Login'
 import Produtos from './pages/produtos/Produtos'
 import Recomendacoes from './pages/recomendacoes/Recomendacoes'
-import Dashboard from './pages/dashboard/Dashboard'
-import LayoutCliente from './layouts/LayoutCliente'
-import LayoutRestaurante from './layouts/LayoutRestaurante'
-
 
 function App() {
   return (
       <AuthProvider>
         <ToastContainer/>
+        <CarrinhoProvider>
           <BrowserRouter>
             <Routes>
               {/* AREA CLIENTE */}
@@ -37,6 +38,7 @@ function App() {
               </Route>
           </Routes>
           </BrowserRouter>
+          </CarrinhoProvider>
       </AuthProvider>
   )
 }
